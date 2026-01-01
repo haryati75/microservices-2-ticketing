@@ -1,0 +1,35 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "Microservices Ticketing App - Authentication Service",
+  "author": "Haryati Hassan",
+  "license": "MIT",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env.local src/index.ts",
+    "start": "node --env-file=.env dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.3",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^4.0.15",
+    "supertest": "^7.1.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}

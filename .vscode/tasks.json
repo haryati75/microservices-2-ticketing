@@ -19,9 +19,6 @@
           "beginsPattern": "^.*tsx watch.*",
           "endsPattern": "^.*watching for changes.*"
         }
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
       }
     }
   ]

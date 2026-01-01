@@ -38,16 +38,16 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm run test:run
+        run: npm run test:run --workspaces --if-present
 
       - name: Run TypeScript type checking
-        run: npm run typecheck
+        run: npm run typecheck --workspaces --if-present
 
       - name: Check ESLint
-        run: npm run lint
+        run: npm run lint --workspaces --if-present
 
       - name: Check formatting
         run: npm run format:check
 
       - name: Generate coverage report
-        run: npm run coverage
+        run: npm run coverage --workspaces --if-present

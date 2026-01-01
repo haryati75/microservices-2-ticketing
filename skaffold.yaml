@@ -1,0 +1,17 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+build:
+  local: # build locally
+    push: false # don't push to a registry (default)
+  artifacts:
+    - image: haryati75/auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+manifests:
+  rawYaml:
+    - ./infra/k8s/*
