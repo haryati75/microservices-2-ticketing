@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md' # Ignore changes to Markdown files
+      - '.vscode/**' # Ignore changes to VS Code settings
+      - '.husky/**' # Ignore changes to Husky hooks
+      - 'LICENSE' # Ignore license file changes
+      - '.gitignore' # Ignore gitignore changes
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+      - '.vscode/**'
+      - '.husky/**'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  quality-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:run
+
+      - name: Run TypeScript type checking
+        run: npm run typecheck
+
+      - name: Check ESLint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Generate coverage report
+        run: npm run coverage
