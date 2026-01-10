@@ -39,6 +39,20 @@ cd microservices-2-ticketing
 # Install all workspace dependencies
 npm install
 
+# Install nginx ingress controller (required before running skaffold)
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for ingress controller to be ready
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=120s
+
+# Add ticketing.dev to your hosts file
+# Windows: C:\Windows\System32\drivers\etc\hosts
+# Linux/Mac: /etc/hosts
+# Add this line: 127.0.0.1 ticketing.dev
+
 # Start development servers with Skaffold
 skaffold dev
 
@@ -47,8 +61,8 @@ npm run dev:auth
 ```
 
 Access the app:
-- **Auth Service:** http://localhost:3000 (local dev)
-- **Frontend:** http://thisisunsafe.localhost (via Ingress)
+- **Auth Service:** http://ticketing.dev/api/users/currentuser (via Ingress)
+- **Local dev:** http://localhost:3000
 
 ### Next Steps
 
@@ -241,6 +255,16 @@ describe('Auth API', () => {
 
 ### Local Development with Skaffold
 
+**Prerequisites:** Install nginx ingress controller first:
+
+```bash
+# Install nginx ingress controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+
+# Verify installation
+kubectl get pods -n ingress-nginx
+```
+
 Skaffold automates building, pushing, and deploying to Kubernetes:
 
 ```bash
@@ -298,17 +322,24 @@ kubectl delete -f k8s/
 Access services via domain instead of port-forwarding:
 
 **Local Setup:**
-1. Edit Windows hosts file: `C:\Windows\System32\drivers\etc\hosts`
-   ```
-   127.0.0.1 thisisunsafe.localhost
+1. Install nginx ingress controller (if not already installed):
+   ```bash
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
    ```
 
-2. Deploy ingress:
+2. Edit hosts file:
+   - **Windows:** `C:\Windows\System32\drivers\etc\hosts`
+   - **Linux/WSL:** `/etc/hosts`
+   ```
+   127.0.0.1 ticketing.dev
+   ```
+
+3. Deploy ingress:
    ```bash
    kubectl apply -f infra/k8s/ingress-srv.yaml
    ```
 
-3. Access: http://thisisunsafe.localhost
+4. Access: http://ticketing.dev/api/users/currentuser
 
 ## 💡 Development Workflow
 
