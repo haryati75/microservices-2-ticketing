@@ -7,9 +7,9 @@ import signoutRouter from './signout.js';
 const router = Router();
 
 // Mount sub-routers
-router.use("/currentuser",currentUserRouter);
-router.use("/signin",signinRouter);
-router.use("/signup",signupRouter);
-router.use("/signout",signoutRouter);
+router.use('/currentuser', currentUserRouter);
+router.use('/signin', signinRouter);
+router.use('/signup', signupRouter);
+router.use('/signout', signoutRouter);
 
 export default router;

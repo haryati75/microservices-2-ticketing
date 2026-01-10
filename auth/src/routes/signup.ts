@@ -1,19 +1,17 @@
-import express, { Request, Response} from 'express';
+import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
 
-router.post('/', 
-  body('email')
-    .notEmpty()
-    .isEmail()
-    .withMessage('Email must be valid'),
+router.post(
+  '/',
+  body('email').notEmpty().isEmail().withMessage('Email must be valid'),
   body('password')
     .notEmpty()
     .trim()
     .isLength({ min: 4, max: 20 })
     .withMessage('Password must be between 4 and 20 characters'),
-  (req: Request, res: Response) => { 
+  (req: Request, res: Response) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -22,10 +20,11 @@ router.post('/',
     }
 
     const { email, password } = req.body;
-    console.log(`Creating user with email: ${email} and password: ${password}`);
+    console.log(`Creating user with email: ${String(email)} and password: ${String(password)}`);
 
-  // new User({ email, password }).save();
-  res.status(201).send({ message: 'User created' });
-});
+    // new User({ email, password }).save();
+    res.status(201).send({ message: 'User created' });
+  },
+);
 
 export default router;
