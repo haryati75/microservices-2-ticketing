@@ -450,6 +450,24 @@ git commit -m "feat: add new feature"
 git commit --no-verify
 ```
 
+### Windows Line Endings (CRLF vs LF)
+
+When using Husky on Windows, ensure shell scripts and hooks use LF line endings:
+
+```bash
+# Recommended per-repo setting to avoid line-ending warnings
+git config core.safecrlf false
+
+# Optional global setting for Windows users
+git config --global core.autocrlf input
+```
+
+This repository includes a `.gitattributes` that enforces LF for `.husky/**` and source files, so future clones should not hit CRLF issues. If you ever see `/usr/bin/env: 'sh\r': No such file or directory`, normalize Husky files:
+
+```bash
+find .husky -type f -print0 | xargs -0 sed -i 's/\r$//' 
+```
+
 ## 🔄 Continuous Integration
 
 GitHub Actions validates every push and pull request:
