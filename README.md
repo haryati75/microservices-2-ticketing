@@ -36,6 +36,9 @@ A production-ready monorepo for building microservices with Express, TypeScript,
 git clone <repository-url>
 cd microservices-2-ticketing
 
+# Configure git for consistent line endings (important for husky hooks)
+git config core.safecrlf false
+
 # Install all workspace dependencies
 npm install
 
