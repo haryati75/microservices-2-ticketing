@@ -64,6 +64,8 @@ Access the app:
 - **Auth Service:** http://ticketing.dev/api/users/currentuser (via Ingress)
 - **Local dev:** http://localhost:3000
 
+**Note:** On first access to `ticketing.dev`, Chrome will show a security warning. Type `thisisunsafe` to bypass it (this is normal for local HTTP development).
+
 ### Next Steps
 
 1. Update service `.env.local` files with your configuration
@@ -340,6 +342,12 @@ Access services via domain instead of port-forwarding:
    ```
 
 4. Access: http://ticketing.dev/api/users/currentuser
+
+**Chrome Security Warning:** On first access, Chrome will display a security warning page because the ingress uses HTTP (not HTTPS). This is normal for local development. To proceed:
+- Type `thisisunsafe` in the browser window (the text won't appear as you type)
+- You'll be redirected to the site
+
+**Why this happens:** Chrome requires HTTPS for production sites. For local HTTP development, Chrome shows this safety check. To avoid this warning, you would need to set up SSL/TLS certificates (not recommended for local development).
 
 ## 💡 Development Workflow
 

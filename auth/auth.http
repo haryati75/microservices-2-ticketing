@@ -1,0 +1,40 @@
+@baseUrl = http://localhost:3000
+@ingressUrl = http://ticketing.dev
+
+### Get current user (Local Dev)
+GET {{baseUrl}}/api/users/currentuser
+Content-Type: application/json
+
+### Get current user (Via Ingress)
+GET {{ingressUrl}}/api/users/currentuser
+Content-Type: application/json
+
+### Health check
+GET {{baseUrl}}/health
+Content-Type: application/json
+
+### Signup
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Signin
+POST {{baseUrl}}/api/auth/signin
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Signout
+POST {{baseUrl}}/api/auth/signout
+Content-Type: application/json
+
+### Get current user (authenticated)
+GET {{baseUrl}}/api/auth/currentuser
+Content-Type: application/json
