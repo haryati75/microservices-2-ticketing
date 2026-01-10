@@ -3,6 +3,7 @@ import router from '../../routes/index.js';
 
 export const createTestApp = () => {
   const app = express();
-  app.use(router);
+  app.use(express.json());
+  app.use("/api/users", router);
   return app;
 };
