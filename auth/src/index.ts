@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import router from './routes/index.js';
 import { errorHandler } from './middlewares/error-handler.js';
 import { NotFoundError } from './errors/not-found-error.js';
@@ -15,6 +16,17 @@ app.use((req, res, next) => {
 });
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Listening on http://localhost:${String(port)}!`);
-});
+const start = async () => {
+  try {
+    await mongoose.connect('mongodb://auth-mongo-srv:27017/auth'); // db name: auth
+    console.log('Connected to MongoDB 🐲');
+  } catch (error) {
+    console.error('Error connecting to MongoDB: 🦄', error);
+  }
+
+  app.listen(port, () => {
+    console.log(`🚗 Listening on http://localhost:${String(port)}!`);
+  });
+};
+
+await start();

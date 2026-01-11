@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
+import { User } from '../models/user.js';
 import { RequestValidationError } from '../errors/request-validation-error.js';
-import { DatabaseConnectionError } from '../errors/database-connection-error.js';
+import { BadRequestError } from '../errors/bad-request-error.js';
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage('🐣 Password must be between 4 and 20 characters'),
   ],
-  // eslint-disable-next-line @typescript-eslint/require-await
+
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
 
@@ -24,17 +25,17 @@ router.post(
 
     const { email, password } = req.body;
 
-    // TODO: Add logic to check if user already exists
+    // Check if the user with the given email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new BadRequestError('Email in use 🦄');
+    }
 
-    console.log(
-      `🐦 Creating user with email: ${String(email)} and password: ${String(password)}`,
-    );
+    // Create and save the new user
+    const user = User.build({ email, password });
+    await user.save();
 
-    throw new DatabaseConnectionError();
-
-    // TODO: new User({ email, password }).save();
-    // TODO: Add logic to check db save errors
-    res.status(201).send({ message: 'User created 🦉' });
+    res.status(201).send({ message: '🎉 User created', user });
   },
 );
 

@@ -21,11 +21,13 @@
   "dependencies": {
     "express": "^5.2.1",
     "express-validator": "^7.3.1",
+    "mongoose": "^9.1.2",
     "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.3",
     "@types/express": "^5.0.6",
+    "@types/mongoose": "^5.11.96",
     "@types/node": "^24.10.1",
     "@types/supertest": "^6.0.3",
     "@vitest/coverage-v8": "^4.0.15",
