@@ -27,3 +27,6 @@ Content-Type: application/json
 POST {{baseUrl}}/api/users/signout
 Content-Type: application/json
 
+### Not found route test
+GET {{baseUrl}}/api/users/unknownroute
+Content-Type: application/json
