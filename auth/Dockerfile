@@ -1,4 +1,7 @@
-FROM node:24-alpine
+FROM node:22-alpine
+
+# Update Alpine packages to reduce vulnerabilities
+RUN apk update && apk upgrade
 
 WORKDIR /app
 
