@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json .
 
 # Install and build
-RUN npm install
+RUN npm install --omit=dev
 COPY . .
 
 # Start
