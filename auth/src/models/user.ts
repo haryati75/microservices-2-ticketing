@@ -22,15 +22,48 @@ interface UserDoc extends mongoose.Document {
 }
 
 // Define the User schema
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
+    },
   },
-  password: {
-    type: String,
-    required: true,
+  {
+    // not common to include toJSON in schema options in MVC,
+    // but here we do it to centralize the logic of hiding
+    // sensitive info like password and changing _id to id
+    // usually done in controller or service layer
+    toJSON: {
+      // TODO: below commented code leads totypescript complains about
+      // 1) not recognizing ret.id and
+      // 2) deleting non-optional properties in transform
+      // transform: (doc, ret) => {
+      //  ret.id = ret._id;
+      //  delete ret._id;
+      //  delete ret.__v;
+      //  delete ret.password;
+      // }
+      // implement virtuals and object destructuring as an alternative to transform
+      virtuals: true,
+      transform(doc, ret) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _id, __v, password, ...rest } = ret;
+        return rest;
+      },
+    },
   },
+);
+
+// This creates an 'id' virtual that maps to '_id'
+// usage in toJSON above
+userSchema.virtual('id').get(function () {
+  return this._id.toHexString();
 });
 
 // Pre-save hook to hash the password

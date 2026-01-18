@@ -1,5 +1,5 @@
 # Via Ingress URL
-@baseUrl = http://ticketing.dev
+@baseUrl = https://ticketing.dev
 
 ### Get current user (Local Dev)
 GET {{baseUrl}}/api/users/currentuser
