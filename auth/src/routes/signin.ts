@@ -24,7 +24,9 @@ router.post(
 
     // Find the user by email
     // include password field explicitly since select: false in schema
-    const existingUser = await User.findOne({ email }).select('+password');
+    const existingUser = await User.findOne({ email: { $eq: email } }).select(
+      '+password',
+    );
     if (!existingUser) {
       throw new BadRequestError('🥾 Invalid credentials');
     }
