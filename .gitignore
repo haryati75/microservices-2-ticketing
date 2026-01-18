@@ -5,6 +5,7 @@
 
 # Dependencies
 node_modules/
+.next
 
 # TypeScript build output
 dist/
