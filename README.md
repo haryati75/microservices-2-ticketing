@@ -48,6 +48,18 @@ kubectl wait --namespace ingress-nginx \
   --selector=app.kubernetes.io/component=controller \
   --timeout=120s
 
+# Create JWT secret required by auth service
+kubectl create secret generic jwt-secret --from-literal=JWT_KEY=your_jwt_key
+
+# Expose auth Mongo on an alternate host port (avoid clashing with a local Mongo on 27017)
+kubectl port-forward svc/auth-mongo-srv 27018:27017
+# Or run port-forward in background (detached)
+kubectl port-forward svc/auth-mongo-srv 27018:27017 >/tmp/auth-mongo-portforward.log 2>&1 &
+# Stop later with: pkill -f "port-forward svc/auth-mongo-srv 27018:27017"
+
+# Mongo connection string (using forwarded port)
+mongodb://localhost:27018/auth
+
 # Add ticketing.dev to your hosts file
 # Windows: C:\Windows\System32\drivers\etc\hosts
 # Linux/Mac: /etc/hosts
