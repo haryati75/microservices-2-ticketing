@@ -534,6 +534,36 @@ kubectl apply -f k8s/
 kubectl get all
 ```
 
+#### Create NextJS Client 
+
+```bash
+mkdir client
+cd client
+npm init -y
+npm install next react react-dom
+```
+
+Start creating pages in `client/pages/` and run with:
+
+```bash
+npm run dev
+```
+
+Use bootstrap for styling:
+
+```bash
+npm install bootstrap
+```
+Import bootstrap CSS in `client/pages/_app.js`:
+
+```javascript
+import 'bootstrap/dist/css/bootstrap.min.css';
+export default function App({ Component, pageProps }) {
+  return <Component {...pageProps} />;
+}
+```
+
+
 ## 📖 Learning Resources
 
 - [Stephen Grider's Microservices Course](https://www.udemy.com/course/microservices-with-node-js-and-react/)
