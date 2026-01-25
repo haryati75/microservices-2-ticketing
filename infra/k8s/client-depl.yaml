@@ -15,6 +15,9 @@ spec:
       containers:
         - name: client
           image: haryati75/client
+          env:
+            - name: INGRESS_BASE_URL
+              value: http://ingress-nginx-srv
 ---
 apiVersion: v1
 kind: Service

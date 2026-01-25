@@ -24,3 +24,12 @@ spec:
                 name: client-srv
                 port:
                   number: 3000
+---
+# Internal alias so pods in default namespace can reach ingress-nginx by a stable name
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx-srv
+spec:
+  type: ExternalName
+  externalName: ingress-nginx-controller.ingress-nginx.svc.cluster.local
