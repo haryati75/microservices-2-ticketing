@@ -2,8 +2,7 @@ import express from 'express';
 import cookieSession from 'cookie-session';
 
 import router from './routes/index.js';
-import { errorHandler } from './middlewares/error-handler.js';
-import { NotFoundError } from './errors/not-found-error.js';
+import { errorHandler, NotFoundError } from '@charityx/common';
 
 const app = express();
 app.set('trust proxy', true); // trust first proxy

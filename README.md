@@ -563,6 +563,11 @@ export default function App({ Component, pageProps }) {
 }
 ```
 
+#### Publish Common Package to npm
+1. Update version in `common/package.json`
+2. Login to npm: `npm login`
+3. Publish: `npm publish --access public`
+
 
 ## 📖 Learning Resources
 
