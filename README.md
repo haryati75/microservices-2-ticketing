@@ -94,7 +94,7 @@ microservices-2-ticketing/
 ├── tickets/           # Tickets service (future)
 ├── orders/            # Orders service (future)
 ├── payments/          # Payments service (future)
-├── frontend/          # React/Next.js frontend (future)
+├── client/            # React/Next.js frontend application
 ├── infra/             # Infrastructure & Kubernetes configs
 ├── k8s/               # Kubernetes deployment manifests
 └── package.json       # Workspace configuration
@@ -121,7 +121,7 @@ This project uses **npm workspaces** to manage multiple services in a single rep
     "tickets",
     "orders",
     "payments",
-    "frontend"
+    "client"
   ]
 }
 ```
@@ -534,7 +534,7 @@ kubectl apply -f k8s/
 kubectl get all
 ```
 
-#### Create NextJS Client 
+#### Create NextJS Client (using Page Router)
 
 ```bash
 mkdir client
@@ -572,6 +572,7 @@ export default function App({ Component, pageProps }) {
 - [Docker Documentation](https://docs.docker.com/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Vitest Documentation](https://vitest.dev/)
+- [Next.js Documentation](https://nextjs.org/docs)
 
 ## 📄 License
 
