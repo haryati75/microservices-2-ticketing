@@ -1,37 +1,29 @@
 import { useState } from 'react';
-import axios from 'axios';
+import Router from 'next/router';
+import useRequest from '../../hooks/use-request';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState([]);
+  const { doRequest, errors } = useRequest({
+    url: '/api/users/signup',
+    method: 'post',
+    body: {
+      email,
+      password,
+    },
+    onSuccess: () => Router.push('/'),
+  });
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    try {
-      const response = await axios.post('/api/users/signup', {
-        email,
-        password,
-      });
-      console.log(response.data);
-    } catch (error) {
-      setErrors(error.response.data.errors);
-    }
+    await doRequest();
   };
 
   return (
     <form onSubmit={onSubmit}>
       <h1>Sign Up Page</h1>
-      {errors.length > 0 && (
-        <div className="alert alert-danger">
-          <h4>Ooops....</h4>
-          <ul className="my-0">
-            {errors.map((err) => (
-              <li key={err.message}>{err.message}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {errors}
       <div className="form-group">
         <label>Email Address</label>
         <input
