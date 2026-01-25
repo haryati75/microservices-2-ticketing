@@ -4,8 +4,8 @@ const buildClient = ({ req }) => {
   if (typeof window === 'undefined') {
     // We are on the server
     return axios.create({
-      baseURL: process.env.INGRESS_BASE_URL || 'http://ingress-nginx-srv',
-      headers: req.headers,
+      baseURL: process.env.INGRESS_BASE_URL || 'http://ingress-nginx-srv', // use ingress external name
+      headers: req.headers, // include cookies and host
     });
   } else {
     // We are on the client
