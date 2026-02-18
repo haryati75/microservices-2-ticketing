@@ -34,6 +34,7 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
+// Auth tests use the real signup route to get a valid session cookie.
 global.signin = async () => {
   const email = 'test@test.com';
   const password = 'password';

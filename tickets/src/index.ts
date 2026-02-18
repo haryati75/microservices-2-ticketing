@@ -13,7 +13,7 @@ const start = async () => {
   }
 
   try {
-    await mongoose.connect(process.env.MONGO_URI); // db name: auth
+    await mongoose.connect(process.env.MONGO_URI); // db name: tickets
     console.log('Connected to MongoDB 🐲');
   } catch (error) {
     console.error('Error connecting to MongoDB: 🦄', error);
