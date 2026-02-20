@@ -1,0 +1,4 @@
+[submodule "common"]
+	path = common
+	url = https://github.com/haryati75/microservices-2-ticketing-common.git
+	branch = main
