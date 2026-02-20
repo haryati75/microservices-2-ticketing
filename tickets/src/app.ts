@@ -3,6 +3,9 @@ import cookieSession from 'cookie-session';
 
 import { errorHandler, NotFoundError, currentUser } from '@charityx/common';
 import { createTicketRouter } from './routes/new.js';
+import { showTicketRouter } from './routes/show.js';
+import { indexTicketRouter } from './routes/index.js';
+import { updateTicketRouter } from './routes/update.js';
 
 const app = express();
 app.set('trust proxy', true); // trust first proxy
@@ -17,6 +20,9 @@ app.use(currentUser);
 
 // Routes
 app.use(createTicketRouter);
+app.use(showTicketRouter);
+app.use(indexTicketRouter);
+app.use(updateTicketRouter);
 
 // Catch-all middleware for unmatched routes
 app.use((req, res, next) => {

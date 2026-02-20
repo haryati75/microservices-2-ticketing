@@ -1,4 +1,7 @@
 {
-  "**/src/**/*.ts": ["eslint --fix", "prettier --write"],
-  "**/*.{js,json,yaml,yml}": ["prettier --write"]
+  "**/src/**/*.ts": [
+    "npx --no-install eslint --fix",
+    "npx --no-install prettier --write"
+  ],
+  "**/*.{js,json,yaml,yml}": ["npx --no-install prettier --write"]
 }
