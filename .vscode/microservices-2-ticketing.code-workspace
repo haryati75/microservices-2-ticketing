@@ -1,11 +1,20 @@
 {
-	"folders": [
-		{
-			"path": ".."
-		},
-		{
-			"path": "../common"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "..",
+    },
+    {
+      "path": "../common",
+    },
+    {
+      "path": "../auth",
+    },
+    {
+      "path": "../tickets",
+    },
+    {
+      "path": "../client",
+    },
+  ],
+  "settings": {},
 }
