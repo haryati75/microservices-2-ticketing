@@ -138,7 +138,6 @@ Each service is self-contained with its own:
 ### Shared Configuration (Root)
 
 Shared across all services:
-- `.eslintrc.js` - Linting rules
 - `.prettierrc` - Code formatting
 - `.husky/` - Git hooks
 - `tsconfig.json` - Base TypeScript config
