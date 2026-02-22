@@ -72,6 +72,15 @@ npm run listen
 
 ### Listener subscription options (STAN)
 
+```ts
+// Example subscription options from src/listener.ts
+const options = stan.subscriptionOptions()
+	.setManualAckMode(true)
+	.setDeliverAllAvailable()
+	.setDurableName('accounting-service');
+const subscription = stan.subscribe('ticket:created', 'queue-group-name', options);
+```
+
 The listener in `src/listener.ts` uses NATS Streaming (STAN) subscription options that control delivery semantics. These are important if you want “at least once” processing and safe restarts.
 
 - `setManualAckMode(true)`
