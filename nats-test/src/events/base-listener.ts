@@ -1,10 +1,17 @@
 import { Message, Stan } from 'node-nats-streaming';
+import { Subjects } from './subjects.js';
 
-export abstract class Listener {
-  abstract subject: string;
-  abstract queueGroupName: string;
+interface Event {
+  subject: Subjects;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abstract onMessage(data: any, msg: Message): void;
+  data: any;
+}
+
+export abstract class Listener<T extends Event> {
+  abstract subject: T['subject'];
+  abstract queueGroupName: string;
+
+  abstract onMessage(data: T['data'], msg: Message): void;
   private client: Stan;
   protected ackWait = 5 * 1000; // default acknowledgment wait time of 5 seconds
 
