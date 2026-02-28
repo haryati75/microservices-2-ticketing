@@ -6,6 +6,8 @@ declare global {
   var signin: () => string[];
 }
 
+vi.mock('../nats-wrapper.js'); // Mock the NATS wrapper to prevent actual NATS connections during tests
+
 let mongo: MongoMemoryServer;
 beforeAll(async () => {
   process.env.JWT_KEY = 'test_jwt_key';
@@ -18,6 +20,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  vi.clearAllMocks();
   const collections = await mongoose.connection.db?.collections();
 
   if (collections) {
