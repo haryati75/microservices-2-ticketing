@@ -200,6 +200,9 @@ npm run test --workspace=auth
 # Build Docker image
 docker build -f auth/Dockerfile -t haryati75/auth:latest .
 
+# Push image to Docker Hub (if your cluster pulls from registry)
+docker push haryati75/auth:latest
+
 # Deploy to Kubernetes
 kubectl apply -f k8s/auth-depl.yaml
 ```
@@ -509,7 +512,7 @@ Since Husky fixes linting/formatting locally:
 | Kubernetes 503 error | Check pod status: `kubectl get pods` and logs: `kubectl logs deployment/auth-depl` |
 | Skaffold build fails | Verify Docker image name in skaffold.yaml matches service name |
 | Port already in use | Change PORT env var or kill process |
-| Image not found in K8s | Ensure image is built: `docker build -f auth/Dockerfile -t haryati75/auth .` |
+| Image not found in K8s | Ensure image is built and pushed: `docker build -f auth/Dockerfile -t haryati75/auth:latest . && docker push haryati75/auth:latest` |
 
 ### Common Commands
 
