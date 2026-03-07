@@ -18,6 +18,9 @@
     {
       "path": "../nats-test",
     },
+    {
+      "path": "../orders",
+    },
   ],
   "settings": {},
 }
