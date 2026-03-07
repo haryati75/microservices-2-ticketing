@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../../app.js';
 import { Order, OrderStatus } from '../../models/order.js';
-import { Ticket } from '../../models/ticket.js';
+import { natsWrapper } from '../../nats-wrapper.js';
+import { buildTicket } from './build-ticket.js';
 
 it('returns an error if the ticket does not exist', async () => {
   const ticketId = new mongoose.Types.ObjectId();
@@ -18,11 +19,7 @@ it('returns an error if the ticket does not exist', async () => {
 });
 
 it('returns an error if the ticket is already reserved', async () => {
-  const ticket = Ticket.build({
-    title: 'concert',
-    price: 20,
-  });
-  await ticket.save();
+  const ticket = await buildTicket();
 
   const order = Order.build({
     ticket,
@@ -42,11 +39,7 @@ it('returns an error if the ticket is already reserved', async () => {
 });
 
 it('reserves a ticket', async () => {
-  const ticket = Ticket.build({
-    title: 'concert',
-    price: 20,
-  });
-  await ticket.save();
+  const ticket = await buildTicket();
 
   await request(app)
     .post('/api/orders')
@@ -57,4 +50,16 @@ it('reserves a ticket', async () => {
     .expect(201);
 });
 
-it.todo('emits an order created event');
+it('emits an order created event', async () => {
+  const ticket = await buildTicket();
+
+  await request(app)
+    .post('/api/orders')
+    .set('Cookie', global.signin())
+    .send({
+      ticketId: ticket.id,
+    })
+    .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+});

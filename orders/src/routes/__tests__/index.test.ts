@@ -1,15 +1,6 @@
 import request from 'supertest';
 import { app } from '../../app.js';
-import { Ticket } from '../../models/ticket.js';
-
-const buildTicket = async () => {
-  const ticket = Ticket.build({
-    title: 'concert',
-    price: 20,
-  });
-  await ticket.save();
-  return ticket;
-};
+import { buildTicket } from './build-ticket.js';
 
 it('fetches orders for a particular user', async () => {
   // Create three tickets
