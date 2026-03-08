@@ -11,6 +11,7 @@ interface OrderAttrs {
 
 interface OrderDoc extends mongoose.Document {
   id: string;
+  version: number;
   userId: string;
   status: OrderStatus;
   expiresAt: Date;
@@ -44,6 +45,7 @@ const orderSchema = new mongoose.Schema(
     },
   },
   {
+    optimisticConcurrency: true,
     toJSON: {
       virtuals: true,
       transform(doc, ret) {
@@ -54,6 +56,8 @@ const orderSchema = new mongoose.Schema(
     },
   },
 );
+
+orderSchema.set('versionKey', 'version');
 
 orderSchema.virtual('id').get(function () {
   return this._id.toHexString();
