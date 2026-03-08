@@ -11,6 +11,7 @@ interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   userId: string;
+  version: number;
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
@@ -34,16 +35,19 @@ const ticketSchema = new mongoose.Schema(
     },
   },
   {
+    optimisticConcurrency: true,
     toJSON: {
       virtuals: true,
       transform(doc, ret) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _id, __v, ...rest } = ret;
+        const { _id, ...rest } = ret;
         return rest;
       },
     },
   },
 );
+
+ticketSchema.set('versionKey', 'version');
 
 ticketSchema.virtual('id').get(function () {
   return this._id.toHexString();

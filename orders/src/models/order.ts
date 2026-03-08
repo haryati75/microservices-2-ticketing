@@ -48,7 +48,7 @@ const orderSchema = new mongoose.Schema(
       virtuals: true,
       transform(doc, ret) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _id, __v, ...rest } = ret;
+        const { _id, ...rest } = ret;
         return rest;
       },
     },

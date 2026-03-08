@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { app } from './app.js';
 import { natsWrapper } from './nats-wrapper.js';
+import { TicketCreatedListener } from './events/listeners/ticket-created-listener.js';
+import { TicketUpdatedListener } from './events/listeners/ticket-updated-listener.js';
 
 const port = process.env.PORT ?? 3000;
 
@@ -44,6 +46,9 @@ const start = async () => {
     process.on('SIGTERM', () => {
       natsWrapper.client.close();
     });
+
+    new TicketCreatedListener(natsWrapper.client).listen();
+    new TicketUpdatedListener(natsWrapper.client).listen();
 
     await mongoose.connect(process.env.MONGO_URI); // db name: tickets
     console.log('Connected to MongoDB 🐲');
