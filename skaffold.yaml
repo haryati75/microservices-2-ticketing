@@ -47,3 +47,17 @@ build:
 manifests:
   rawYaml:
     - ./infra/k8s/*
+
+portForward:
+  - resourceType: service
+    resourceName: auth-mongo-srv
+    port: 27017
+    localPort: 27017
+  - resourceType: service
+    resourceName: tickets-mongo-srv
+    port: 27017
+    localPort: 27018
+  - resourceType: service
+    resourceName: orders-mongo-srv
+    port: 27017
+    localPort: 27019
