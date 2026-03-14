@@ -20,6 +20,14 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
     });
     await ticket.save();
 
+    // check if the ticket was created successfully via a query to the database
+    const existingTicket = await Ticket.findById(ticket.id);
+    if (!existingTicket) {
+      throw new Error('Ticket creation failed');
+    }
+
+    console.log('🪃 Ticket created in Orders service:', ticket);
+
     msg.ack();
   }
 }

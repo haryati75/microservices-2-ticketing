@@ -18,10 +18,13 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
     }
 
     // mark the ticket as being reserved by setting its orderId property
+    // TODO: should version be updated here? or will the ticket updated listener handle that?
     ticket.set({ orderId: data.id });
 
     // save the ticket
     await ticket.save();
+
+    console.log(`Ticket ${ticket.id} reserved for order ${data.id}`);
 
     // emit a ticket updated event
     await new TicketUpdatedPublisher(this.client).publish({

@@ -1,4 +1,5 @@
 import { natsWrapper } from './nats-wrapper.js';
+import { OrderCreatedListener } from './events/listeners/order-created-listener.js';
 
 const start = async () => {
   if (!process.env.NATS_CLUSTER_ID) {
@@ -32,6 +33,8 @@ const start = async () => {
     process.on('SIGTERM', () => {
       natsWrapper.client.close();
     });
+
+    new OrderCreatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.error(err);
   }

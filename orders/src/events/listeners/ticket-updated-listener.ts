@@ -13,6 +13,7 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
   ): Promise<void> {
     const { id, title, price, version } = data;
 
+    console.log('🪃 Received Ticket Updated Event in Orders service:', data);
     const ticket = await Ticket.findByEvent({ id, version });
 
     if (!ticket) {
@@ -21,6 +22,8 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
 
     ticket.set({ title, price });
     await ticket.save();
+
+    console.log('🪃 Ticket updated in Orders service:', ticket);
 
     msg.ack();
   }

@@ -21,6 +21,16 @@
     {
       "path": "../orders",
     },
+    {
+      "path": "../expiration",
+    },
   ],
-  "settings": {},
+  "settings": {
+    "mdb.presetConnections": [
+      {
+        "name": "Preset Connection",
+        "connectionString": "mongodb://localhost:27017",
+      },
+    ],
+  },
 }
