@@ -19,7 +19,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@charityx/common": "^1.0.12",
+    "@charityx/common": "^1.0.14",
     "bull": "^4.16.5",
     "node-nats-streaming": "^0.3.2",
     "tsx": "^4.21.0"

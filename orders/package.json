@@ -19,7 +19,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@charityx/common": "^1.0.12",
+    "@charityx/common": "^1.0.14",
     "cookie-session": "^2.1.1",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",
