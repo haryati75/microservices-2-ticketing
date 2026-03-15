@@ -44,6 +44,14 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: haryati75/payments
+      context: payments
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
 manifests:
   rawYaml:
     - ./infra/k8s/*
@@ -61,3 +69,7 @@ portForward:
     resourceName: orders-mongo-srv
     port: 27017
     localPort: 27019
+  - resourceType: service
+    resourceName: payments-mongo-srv
+    port: 27017
+    localPort: 27020
