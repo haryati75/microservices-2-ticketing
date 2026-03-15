@@ -316,7 +316,7 @@ Optimistic concurrency via the `version` field is the mechanism that prevents ou
 
 ### How version increments
 
-Both `Ticket` (tickets service) and the `Order`/`Ticket` models in the orders service use `mongoose-update-if-current` (`optimisticConcurrency: true`). Every `document.save()` increments `version` by 1 atomically.
+Both `Ticket` (tickets service) and the `Order`/`Ticket` models in the orders service use Mongoose's native optimistic concurrency (`optimisticConcurrency: true`). Every `document.save()` increments `version` by 1 atomically.
 
 In the Orders service, the local ticket replica includes an optional `orderId` field and applies it from `ticket:updated` events. This ensures reservation-only updates are still persisted as state changes, which keeps subsequent `findByEvent` version matching correct.
 
@@ -367,8 +367,8 @@ stateDiagram-v2
   created --> cancelled : DELETE /api/orders
   created --> cancelled : expiration complete event
     created --> awaiting_payment : payment initiated
-    awaiting_payment --> complete : payment confirmed
     awaiting_payment --> cancelled : payment window expires
+    awaiting_payment --> complete : payment confirmed
     complete --> [*]
     cancelled --> [*]
 ```
