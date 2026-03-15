@@ -204,6 +204,7 @@ sequenceDiagram
 2. On save, Mongoose bumps `version` by 1.
 3. `TicketUpdatedPublisher` emits `ticket:updated`.
 4. The Orders `TicketUpdatedListener` looks up the local replica using `Ticket.findByEvent({ id, version })` — which queries for `version - 1` to enforce correct ordering — then updates `title` and `price`.
+  It also persists `orderId` when present (reservation) and clears it when absent (unreservation), so replica version progression stays aligned with ticket lifecycle events.
 
 ---
 
@@ -246,7 +247,7 @@ sequenceDiagram
 2. An `Order` is persisted with `status = 'created'` and `expiresAt = now + 60 seconds`.
 3. `OrderCreatedPublisher` emits `order:created`.
 4. **Tickets service** (`OrderCreatedListener`): marks the ticket as reserved by setting `orderId = order.id`, saves it (version increments), then immediately emits `ticket:updated` carrying the new `orderId` and version.
-5. **Orders service** (`TicketUpdatedListener`): receives the `ticket:updated` event and updates its local replica's version — this keeps the replica in sync so future version-ordered lookups work correctly.
+5. **Orders service** (`TicketUpdatedListener`): receives the `ticket:updated` event and updates its local replica (`title`, `price`, and `orderId`) so version progression stays in sync for both reservation and unreservation paths.
 6. **Expiration service** (`OrderCreatedListener`): calculates `delay = expiresAt - Date.now()` and enqueues a Bull job in Redis with that delay.
 
 ---
@@ -316,6 +317,8 @@ Optimistic concurrency via the `version` field is the mechanism that prevents ou
 ### How version increments
 
 Both `Ticket` (tickets service) and the `Order`/`Ticket` models in the orders service use `mongoose-update-if-current` (`optimisticConcurrency: true`). Every `document.save()` increments `version` by 1 atomically.
+
+In the Orders service, the local ticket replica includes an optional `orderId` field and applies it from `ticket:updated` events. This ensures reservation-only updates are still persisted as state changes, which keeps subsequent `findByEvent` version matching correct.
 
 ### version timeline for a ticket during order creation
 

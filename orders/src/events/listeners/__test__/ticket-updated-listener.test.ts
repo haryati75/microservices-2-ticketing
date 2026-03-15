@@ -50,6 +50,29 @@ it('finds, updates, and saves a ticket', async () => {
   expect(updatedTicket?.version).toEqual(data.version);
 });
 
+it('updates reservation state via orderId and increments version', async () => {
+  const { listener, ticket, data, msg } = await setup();
+
+  data.orderId = new mongoose.Types.ObjectId().toHexString();
+  await listener.onMessage(data, msg);
+
+  const reservedTicket = await Ticket.findById(ticket.id);
+  expect(reservedTicket?.orderId).toEqual(data.orderId);
+  expect(reservedTicket?.version).toEqual(data.version);
+
+  const unreserveData: TicketUpdatedEvent['data'] = {
+    ...data,
+    version: data.version + 1,
+    orderId: undefined,
+  };
+
+  await listener.onMessage(unreserveData, msg);
+
+  const unreservedTicket = await Ticket.findById(ticket.id);
+  expect(unreservedTicket?.orderId).toBeUndefined();
+  expect(unreservedTicket?.version).toEqual(unreserveData.version);
+});
+
 it('acks the message', async () => {
   const { listener, data, msg } = await setup();
 

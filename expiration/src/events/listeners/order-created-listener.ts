@@ -10,7 +10,6 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   onMessage(data: OrderCreatedEvent['data'], msg: Message) {
     const delay = new Date(data.expiresAt).getTime() - new Date().getTime();
 
-    // TODO: not working
     void expirationQueue.add(
       {
         orderId: data.id,

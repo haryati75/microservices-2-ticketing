@@ -26,8 +26,6 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
       throw new Error('Ticket creation failed');
     }
 
-    console.log('🪃 Ticket created in Orders service:', ticket);
-
     msg.ack();
   }
 }
