@@ -8,6 +8,7 @@ A production-ready monorepo for building microservices with Express, TypeScript,
 
 ## 📚 Table of Contents
 
+- [Project Progress](#-project-progress) - Current completion status at a glance
 - [Quick Start](#-quick-start) - Get up and running in minutes
 - [Project Overview](#-project-overview) - Architecture and services
 - [Monorepo Structure](#-monorepo-structure) - How services are organized
@@ -18,7 +19,27 @@ A production-ready monorepo for building microservices with Express, TypeScript,
 - [Development Workflow](#-development-workflow) - Daily development process
 - [Git Hooks with Husky](#-git-hooks-with-husky) - Automated code quality
 - [Continuous Integration](#-continuous-integration) - GitHub Actions CI/CD
+- [What's Next](#-whats-next) - Remaining work to reach a fully functional app
 - [Troubleshooting](#-troubleshooting) - Common issues and solutions
+
+## 🗺️ Project Progress
+
+This is a course follow-along project. The table below shows what has been built so far and what still needs to be done.
+
+| Area | Status | Notes |
+|------|--------|-------|
+| **Auth service** | ✅ Complete | Signup, signin, signout, currentuser, JWT |
+| **Tickets service** | ✅ Complete | CRUD routes + event publishing/listening |
+| **Orders service** | ✅ Complete | CRUD routes + event publishing/listening |
+| **Expiration service** | ✅ Complete | Bull/Redis delayed queue + event publishing |
+| **Payments service** | 🚧 In progress | Order replica + event listeners done; payment route + Stripe integration pending |
+| **Client (Next.js)** | 🚧 In progress | Auth pages done; tickets, orders, and payment UI pages pending |
+| **Shared common package** | ✅ Complete | Published as `@charityx/common` — all event contracts, base classes, middleware |
+| **Kubernetes infra** | ✅ Complete | Deployments for all services + NATS + Redis |
+
+See [What's Next](#-whats-next) for a detailed breakdown of the remaining work.
+
+---
 
 ## 🚀 Quick Start
 
@@ -82,7 +103,7 @@ Access the app:
 
 1. Update service `.env.local` files with your configuration
 2. Review service-specific documentation in each service folder
-3. Add additional services following the auth service pattern
+3. See [What's Next](#-whats-next) for the remaining implementation work
 
 ## 📋 Project Overview
 
@@ -90,13 +111,15 @@ This is a **monorepo** containing multiple microservices and a frontend applicat
 
 ```
 microservices-2-ticketing/
-├── auth/              # Authentication service (Express + TypeScript)
-├── tickets/           # Tickets service (future)
-├── orders/            # Orders service (future)
-├── payments/          # Payments service (future)
-├── client/            # React/Next.js frontend application
-├── infra/             # Infrastructure & Kubernetes configs
-├── k8s/               # Kubernetes deployment manifests
+├── auth/              # Authentication service (Express + TypeScript) ✅
+├── tickets/           # Tickets CRUD service (Express + TypeScript) ✅
+├── orders/            # Orders service with reservation logic ✅
+├── expiration/        # Expiration service (Bull/Redis delayed jobs) ✅
+├── payments/          # Payments service (Stripe) 🚧
+├── client/            # React/Next.js frontend application 🚧
+├── common/            # Git submodule → @charityx/common shared package ✅
+├── nats-test/         # Local NATS Streaming sandbox/test scripts
+├── infra/k8s/         # Kubernetes deployment manifests
 └── package.json       # Workspace configuration
 ```
 
@@ -114,14 +137,12 @@ This project uses **npm workspaces** to manage multiple services in a single rep
 
 ### Root Package Configuration
 
+The root `package.json` currently only declares `auth` as an npm workspace (the other services were added later and each manage their own `node_modules` independently). The other services (`tickets`, `orders`, `expiration`, `payments`) each manage their own `node_modules` via their own `package-lock.json`. The client is a standalone Next.js project.
+
 ```json
 {
   "workspaces": [
-    "auth",
-    "tickets",
-    "orders",
-    "payments",
-    "client"
+    "auth"
   ]
 }
 ```
@@ -151,10 +172,10 @@ Shared across all services:
 # Development
 npm run dev:auth             # Start auth service in dev mode
 
-# Testing
-npm run test                 # Run tests in all services (watch mode)
+# Testing (auth workspace only — other services run tests from their own directory)
+npm run test                 # Run tests in watch mode
 npm run test:run             # Run tests once (CI mode)
-npm coverage                 # Generate coverage reports
+npm run coverage             # Generate coverage reports
 
 # Code Quality
 npm run typecheck            # Type check all services
@@ -169,10 +190,10 @@ skaffold dev                 # Watch mode with hot reload
 skaffold build               # Build all service images
 ```
 
-### Service Level
+### Service Level (run from inside a service directory)
 
 ```bash
-# Inside auth/ (or any service)
+# Inside any service directory (auth/, tickets/, orders/, expiration/, payments/)
 npm run dev                  # Dev server with hot reload
 npm run start                # Run compiled build
 npm run build                # Compile TypeScript
@@ -184,10 +205,10 @@ npm run typecheck            # Check types
 
 ## 🔧 Services
 
-### Auth Service
+### Auth Service ✅
 
 **Purpose:** User authentication, JWT tokens, user management  
-**Port:** 3001 (Kubernetes) / 3000 (local dev)  
+**Port:** 3000 (Kubernetes ClusterIP) / 3000 (local dev)  
 **Location:** `/auth`
 
 ```bash
@@ -199,32 +220,117 @@ npm run test --workspace=auth
 
 # Build Docker image
 docker build -f auth/Dockerfile -t haryati75/auth:latest .
-
-# Push image to Docker Hub (if your cluster pulls from registry)
-docker push haryati75/auth:latest
-
-# Deploy to Kubernetes
-kubectl apply -f k8s/auth-depl.yaml
 ```
 
-**Environment Variables** (`.env.local`):
-```
-PORT=3000
-NODE_ENV=development
-```
+**Key Endpoints (all under `/api/users`):**
+- `POST /api/users/signup` — Register a new user
+- `POST /api/users/signin` — Login and receive a JWT session cookie
+- `POST /api/users/signout` — Clear the session cookie
+- `GET /api/users/currentuser` — Return the currently signed-in user (or `null`)
+- `GET /api/users/` — List all users (dev/admin use)
 
-**Key Endpoints:**
-- `POST /api/auth/signup` - Register user
-- `POST /api/auth/signin` - Login user
-- `POST /api/auth/signout` - Logout
-- `GET /api/auth/currentuser` - Get current user
+---
 
-### Future Services
+### Tickets Service ✅
 
-- **Tickets Service** - Ticket creation, management, listing
-- **Orders Service** - Order creation, payment coordination
-- **Payments Service** - Payment processing integration
-- **Frontend** - React/Next.js client application
+**Purpose:** Create, update, and list tickets for sale  
+**Location:** `/tickets`
+
+**Key Endpoints (all under `/api/tickets`):**
+- `POST /api/tickets` — Create a new ticket (requires auth)
+- `GET /api/tickets` — List all tickets
+- `GET /api/tickets/:id` — Get a single ticket
+- `PUT /api/tickets/:id` — Update a ticket (owner only; blocked if already reserved)
+
+**Events Published:** `ticket:created`, `ticket:updated`  
+**Events Consumed:** `order:created` (marks ticket reserved), `order:cancelled` (clears reservation)
+
+---
+
+### Orders Service ✅
+
+**Purpose:** Create and manage ticket purchase orders  
+**Location:** `/orders`
+
+**Key Endpoints (all under `/api/orders`):**
+- `POST /api/orders` — Reserve a ticket and create an order (requires auth)
+- `GET /api/orders` — List all orders for the current user
+- `GET /api/orders/:id` — Get a single order
+- `DELETE /api/orders/:id` — Cancel an order (user-initiated)
+
+**Events Published:** `order:created`, `order:cancelled`  
+**Events Consumed:** `ticket:created`, `ticket:updated` (maintains local ticket replica), `expiration:complete` (auto-cancels expired orders)
+
+---
+
+### Expiration Service ✅
+
+**Purpose:** Automatically cancel orders that are not paid within the reservation window (60 seconds)  
+**Location:** `/expiration`
+
+No HTTP endpoints. Runs a **Bull/Redis** delayed job queue:
+1. Listens for `order:created` → enqueues a job with `delay = expiresAt − now`
+2. When the job fires → publishes `expiration:complete { orderId }`
+
+**Events Published:** `expiration:complete`  
+**Events Consumed:** `order:created`
+
+---
+
+### Payments Service 🚧
+
+**Purpose:** Process payments via Stripe and record charge receipts  
+**Location:** `/payments`
+
+**What is implemented:**
+- `Order` replica model (mirrors orders service state via events)
+- `OrderCreatedListener` — saves an order replica to the payments DB
+- `OrderCancelledListener` — marks the local order replica as `cancelled`
+
+**What still needs to be built:**
+- `POST /api/payments` route — validate the charge against the local order replica and call Stripe
+- `Payment` model — stores `{ orderId, stripeId }`
+- `PaymentCreatedPublisher` — emits `payment:created` after a successful charge
+- `payment:created` event contract in `@charityx/common`
+- Kubernetes `STRIPE_KEY` secret and env var wiring
+
+---
+
+### Client (Next.js) 🚧
+
+**Purpose:** React/Next.js frontend application (Pages Router)  
+**Location:** `/client`
+
+**What is implemented:**
+- `_app.js` with Bootstrap CSS and shared `<Header>` component
+- Landing page (`/`) — shows welcome message based on `currentUser`
+- Sign-up page (`/auth/signup`)
+- Sign-in page (`/auth/signin`)
+- Sign-out page (`/auth/signout`)
+- `use-request` hook — generic hook for API calls with error display
+- `build-client` helper — constructs the right Axios base URL for server-side vs. client-side rendering
+
+**What still needs to be built:**
+- Tickets list page (`/tickets`) — fetch and display `GET /api/tickets`
+- New ticket page (`/tickets/new`) — form to `POST /api/tickets`
+- Individual ticket page (`/tickets/[ticketId]`) — show ticket + "Purchase" button
+- Order confirmation page (`/orders/[orderId]`) — show order details + countdown timer
+- Payment page — embed Stripe `react-stripe-checkout` and call `POST /api/payments`
+
+---
+
+### Shared Common Package (`@charityx/common`) ✅
+
+**Location:** `common/` (Git submodule → [microservices-2-ticketing-common](https://github.com/haryati75/microservices-2-ticketing-common))  
+**Published as:** `@charityx/common` on npm
+
+Provides:
+- `Subjects` enum — all NATS subject strings
+- `Listener<T>` / `Publisher<T>` base classes
+- Event interfaces — `TicketCreatedEvent`, `TicketUpdatedEvent`, `OrderCreatedEvent`, `OrderCancelledEvent`, `ExpirationCompleteEvent`
+- `OrderStatus` enum
+- Express middleware — `currentUser`, `requireAuth`, `errorHandler`, `validateRequest`
+- Custom errors — `BadRequestError`, `NotFoundError`, `NotAuthorizedError`, `DatabaseConnectionError`
 
 ## 🧪 Testing
 
@@ -317,7 +423,7 @@ docker push haryati75/auth:latest
 
 ```bash
 # Deploy all services
-kubectl apply -f k8s/
+kubectl apply -f infra/k8s/
 
 # Check deployment status
 kubectl get pods
@@ -330,7 +436,7 @@ kubectl logs -f deployment/auth-depl
 kubectl port-forward svc/auth-svc 3001:3001
 
 # Cleanup
-kubectl delete -f k8s/
+kubectl delete -f infra/k8s/
 ```
 
 ### Ingress Configuration
@@ -407,7 +513,7 @@ npm pkg set description="New service description"
 # Edit root package.json and add "new-service" to workspaces array
 
 # 5. Create Kubernetes manifests
-# Copy k8s/auth-depl.yaml and k8s/auth-svc.yaml, rename for new service
+# Copy infra/k8s/auth-depl.yaml and infra/k8s/auth-svc.yaml, rename for new service
 
 # 6. Update skaffold.yaml
 # Add new service to build artifacts
@@ -501,18 +607,53 @@ Since Husky fixes linting/formatting locally:
 - ❌ **Tests fail** → Fix and push again
 - ❌ **Type errors** → Fix and push again
 
+## 🗺️ What's Next
+
+The following items are the remaining steps to complete the course project:
+
+### 1. Payments Service — complete the payment flow
+
+- [ ] Add `payment:created` event contract to `@charityx/common` (subject + interface + export)
+- [ ] Create a `Payment` Mongoose model (`{ orderId, stripeId }`)
+- [ ] Build `POST /api/payments` route:
+  - Authenticate the user
+  - Look up the order replica in the payments DB and verify ownership + non-cancelled status
+  - Call Stripe `charges.create` with the supplied `token`
+  - Save a new `Payment` document
+  - Publish `payment:created`
+- [ ] Create `PaymentCreatedPublisher`
+- [ ] Add `STRIPE_KEY` as a Kubernetes secret and wire it through the payments deployment YAML
+- [ ] Write tests for the new route and publisher
+
+### 2. Client — build the tickets, orders, and payment UI
+
+- [ ] **Tickets list page** (`/tickets`) — fetch `GET /api/tickets` and render a table with a "View" link per ticket
+- [ ] **New ticket page** (`/tickets/new`) — form with title + price; calls `POST /api/tickets`
+- [ ] **Ticket detail page** (`/tickets/[ticketId]`) — show ticket details + "Purchase" button that calls `POST /api/orders`
+- [ ] **Order confirmation page** (`/orders/[orderId]`) — show order status + countdown timer; render `<StripeCheckout>` when order is `created`
+- [ ] **Stripe payment** — install `react-stripe-checkout`, call `POST /api/payments` on token, redirect to index on success
+
+### 3. Optional polish
+
+- [ ] Guard `ExpirationCompleteListener` against cancelling an already `complete` order (the guard is currently commented out — important once payments are live)
+- [ ] Add `payment:created` listener to the orders service to mark the order `complete`
+- [ ] Expand client header to show links to tickets list and "sell a ticket" depending on auth state
+
+---
+
 ## 🐛 Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| `Module not found` | Run `npm install` at root and in service |
-| Type errors | Run `npm run typecheck` |
-| Linting errors | Run `npm run lint:fix` |
-| Tests failing | Check `npm test` output |
+| `Module not found` | Run `npm install` at root and inside the affected service directory |
+| Type errors | Run `npm run typecheck` inside the service |
+| Linting errors | Run `npm run lint:fix` inside the service |
+| Tests failing | Check `npm run test:run` output |
 | Kubernetes 503 error | Check pod status: `kubectl get pods` and logs: `kubectl logs deployment/auth-depl` |
-| Skaffold build fails | Verify Docker image name in skaffold.yaml matches service name |
-| Port already in use | Change PORT env var or kill process |
-| Image not found in K8s | Ensure image is built and pushed: `docker build -f auth/Dockerfile -t haryati75/auth:latest . && docker push haryati75/auth:latest` |
+| Skaffold build fails | Verify Docker image name in `skaffold.yaml` matches service name |
+| Port already in use | Change PORT env var or kill the conflicting process |
+| Image not found in K8s | Build and push: `docker build -f auth/Dockerfile -t haryati75/auth:latest . && docker push haryati75/auth:latest` |
+| `thisisunsafe` not working | This bypasses Chrome's certificate warning on `ticketing.dev`. Make sure you click anywhere on the Chrome warning page first, then type the phrase (it won't be visible as you type) |
 
 ### Common Commands
 
@@ -529,46 +670,21 @@ npm run build
 npm run typecheck
 
 # Reset Kubernetes
-kubectl delete -f k8s/
-kubectl apply -f k8s/
+kubectl delete -f infra/k8s/
+kubectl apply -f infra/k8s/
 
 # View all resources
 kubectl get all
 ```
 
-#### Create NextJS Client (using Page Router)
-
-```bash
-mkdir client
-cd client
-npm init -y
-npm install next react react-dom
-```
-
-Start creating pages in `client/pages/` and run with:
-
-```bash
-npm run dev
-```
-
-Use bootstrap for styling:
-
-```bash
-npm install bootstrap
-```
-Import bootstrap CSS in `client/pages/_app.js`:
-
-```javascript
-import 'bootstrap/dist/css/bootstrap.min.css';
-export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
-}
-```
-
 #### Publish Common Package to npm
+
+If you make changes to the shared `@charityx/common` package:
 1. Update version in `common/package.json`
 2. Login to npm: `npm login`
-3. Publish: `npm publish --access public`
+3. Build: `npm run build` (inside `common/`)
+4. Publish: `npm publish --access public`
+5. Update the `@charityx/common` version in each affected service's `package.json` and re-run `npm install`
 
 
 ## 📖 Learning Resources
